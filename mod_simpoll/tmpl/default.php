@@ -44,7 +44,7 @@ $customCss = $params->get('customCss', '');
                     </label><br>
                 <?php endif; ?>
             <?php endforeach; ?>
-            <button type="submit"><?php echo Text::_('MOD_SIMPOLL_SUBMIT'); ?></button>
+            <button class="btn btn-secondary" type="submit"><?php echo Text::_('MOD_SIMPOLL_SUBMIT'); ?></button>
         </form>
     <?php else: ?>
         <h3><?php echo Text::_('MOD_SIMPOLL_THANK_YOU'); ?></h3>

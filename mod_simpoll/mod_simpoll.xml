@@ -67,7 +67,7 @@
 .poll-bar-fill {
     background-color: #4caf50;
     height: 100%;
-}" filter="raw" label="Custom CSS" description="CSS code to override the default template styling" rows="5" editor="codemirror|none" buttons="false" syntax="css" />
+} .poll-result { margin: 1rem; } .poll-result p { margin-bottom: .1rem; }" filter="raw" label="Custom CSS" description="CSS code to override the default template styling" rows="5" editor="codemirror|none" buttons="false" syntax="css" />
             </fieldset>
             <fieldset name="advanced" label="JGLOBAL_FIELDSET_ADVANCED">
                 <field

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="5.0" client="site" method="upgrade">
-    <name>mod_simpoll</name>
+    <name>SimPoll Module</name>
     <title>MOD_SIMPOLL_TITLE</title>
     <description><![CDATA[
 	<h2>Sim-Poll Module</h2>

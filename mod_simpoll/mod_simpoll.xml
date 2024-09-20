@@ -17,6 +17,7 @@
         <filename module="mod_simpoll">mod_simpoll.php</filename>
         <filename>index.html</filename>
         <folder>tmpl</folder>
+        <folder>sql</folder>
         <folder>language</folder>
     </files>
 
@@ -85,6 +86,16 @@
         <language tag="en-GB">language/en-GB/mod_simpoll.ini</language>
         <language tag="el-GR">language/el-GR/mod_simpoll.ini</language>
     </languages>
+    <install>
+     <sql>
+         <file driver="mysqli" charset="utf8">sql/install.mysql.utf8.sql</file>
+     </sql>
+</install>
 
+<uninstall>
+     <sql>
+         <file driver="mysqli" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+     </sql>
+</uninstall>
 </extension>
 

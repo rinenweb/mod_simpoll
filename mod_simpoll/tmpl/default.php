@@ -68,5 +68,10 @@ $customCss = $params->get('customCss', '');
                 </div>
             <?php endif; ?>
         <?php endforeach; ?>
+      <!-- Add a reset button -->
+    <!-- <form method="post" action="">
+            <input type="hidden" name="reset_vote" value="1" />
+            <button class="btn btn-warning" type="submit"><?php echo 'RESET VOTE'; ?></button>
+        </form> -->
     <?php endif; ?>
 </div>

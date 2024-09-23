@@ -48,14 +48,7 @@
 			                    label="Answer Text"
                                 filter="safehtml"
 			                    />
-                                <field 
-                                name="vote_count" 
-                                type="number" 
-                                label="MOD_SIMPOLL_VOTE_COUNT_LABEL" 
-                                description="MOD_SIMPOLL_VOTE_COUNT_DESC" 
-                                default="0" 
-                                readonly="true" />
-		                    </fieldset>	                    
+		        	</fieldset>	                    
                         </form>
                  </field>
                  <field name="customCss" type="editor" default=".poll-bar {

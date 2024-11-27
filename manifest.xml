@@ -11,6 +11,6 @@
 		<downloads>
 			<downloadurl type="full" format="zip">https://github.com/rinenweb/mod_simpoll/releases/download/v1.1/mod_simpoll.zip</downloadurl>
 		</downloads>
-		<targetplatform name="joomla" version="((4.[234])|(5.[01234]))" />
+		<targetplatform name="joomla" version="((4\.(234))|(5\.(01234)))" />
 	</update>
 </updates>

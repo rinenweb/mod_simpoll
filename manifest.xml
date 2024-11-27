@@ -13,17 +13,4 @@
 		</downloads>
 		<targetplatform name="joomla" version="((4\.[34])|(5\.[01234]))" />
 	</update>
-	<update>
-		<name>SimPoll Module</name>
-		<description>A Joomla module that allows admins to create a poll and display it on the front end.</description>
-		<element>mod_diavgeia</element>
-		<type>module</type>
-		<version>1.0</version>
-		<client>site</client>
-		<infourl title="SimPoll Module">https://github.com/rinenweb/mod_simpoll/releases/tag/v1.0</infourl>
-		<downloads>
-			<downloadurl type="full" format="zip">https://github.com/rinenweb/mod_simpoll/releases/download/v1.0/mod_simpoll.zip</downloadurl>
-		</downloads>
-		<targetplatform name="joomla" version="((4\.[34])|(5\.[01234]))" />
-	</update>
 </updates>

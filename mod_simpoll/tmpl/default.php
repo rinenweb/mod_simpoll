@@ -54,6 +54,28 @@ $customCss = $params->get('customCss', '');
         <h4><?php echo Text::_('MOD_SIMPOLL_RESULTS'); ?></h4>
 
         <?php if (isset($answers) && !empty($answers)): ?>
+            <!-- Calculate raw percentages -->
+            <?php
+                $rawPercentages = [];
+                foreach ($answers as $key => $answer) {
+                    $voteCount = 0;
+                    foreach ($results as $result) {
+                        if ($result->option_text === $answer->answer_text) {
+                            $voteCount = $result->vote_count;
+                            break;
+                        }
+                    }
+                    $rawPercentages[$key] = $totalVotes > 0 ? ($voteCount / $totalVotes) * 100 : 0;
+                }
+
+                // Normalize percentages to sum up to 100%
+                $totalRawPercentage = array_sum($rawPercentages);
+                $percentages = [];
+                foreach ($rawPercentages as $key => $rawPercentage) {
+                    $percentages[$key] = $totalRawPercentage > 0 ? ($rawPercentage / $totalRawPercentage) * 100 : 0;
+                }
+            ?>
+
             <!-- Iterate over the answers defined in the module -->
             <?php foreach ($answers as $key => $answer): ?>
                 <?php if (isset($answer->answer_text)): ?>
@@ -66,23 +88,24 @@ $customCss = $params->get('customCss', '');
                                 break;
                             }
                         }
-
-                        // Calculate the percentage of votes
-                        $percentage = $totalVotes > 0 ? round(($voteCount / $totalVotes) * 100) : 0;
                     ?>
                     <div class="poll-result">
                         <p>
                             <?php echo htmlspecialchars($answer->answer_text, ENT_QUOTES, 'UTF-8'); ?>:
                             <?php echo $voteCount; ?> <?php echo $voteCount == 1 ? Text::_('MOD_SIMPOLL_VOTE') : Text::_('MOD_SIMPOLL_VOTES'); ?>
-                            (<?php echo $percentage; ?>%)
+                            (<?php echo round($percentages[$key]); ?>%)
                         </p>
                         <div class="poll-bar">
-                            <div class="poll-bar-fill" style="width: <?php echo $percentage; ?>%;"></div>
+                            <div class="poll-bar-fill" style="width: <?php echo round($percentages[$key]); ?>%;"></div>
                         </div>
                     </div>
                 <?php endif; ?>
             <?php endforeach; ?>
         <?php endif; ?>
     <?php endif; ?>
+    <?php if ($params->get('custom_text')) : ?>
+    <div class="poll-custom-text">
+        <?php echo $params->get('custom_text'); ?>
+    </div>
+    <?php endif; ?>
 </div>
-

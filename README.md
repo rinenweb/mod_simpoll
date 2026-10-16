@@ -6,7 +6,8 @@ SimPoll is a module for Joomla that allows admins to create a poll and display i
 SimPoll Module is fairly simple and will (hopefully) play nice with:
 - [x] Joomla 4.X
 - [x] Joomla 5.X
-- [x] PHP 8.0+
+- [x] Joomla 6.X
+- [x] PHP 7.4+
 
 ## Installation
 + Download the SimPoll Module from here.

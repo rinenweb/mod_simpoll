@@ -1,66 +1,60 @@
 <?php
+/**
+ * @package    Mod_simpoll
+ * @author     Rinenweb <info@rinenweb.eu>
+ * @license    GNU General Public License v3
+ * @link       https://www.rinenweb.eu
+ */
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Helper\ModuleHelper;
-use Joomla\CMS\Language\Text;  // Use the Text class to handle language strings
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
+use Rinenweb\Module\Simpoll\Site\Helper\SimpollHelper;
 
-// Get the parameters from the module
-$module_id = $module->id;  // Automatically fetch the module's unique id (poll_id)
-$question = $params->get('question');
-$answers = $params->get('answers', []);
+$app      = Factory::getApplication();
+$input    = $app->getInput();
+$session  = $app->getSession();
+$moduleId = (int) $module->id;
 
-// Initialize the Joomla database object
-$db = Factory::getDbo();
-$query = $db->getQuery(true);
+$question = (string) $params->get('question', '');
 
-$input = Factory::getApplication()->input;
-$vote = $input->post->get('poll_answer', '', 'STRING');
+// [answer key => answer text], in the order set by the admin.
+// Only these keys are accepted as votes.
+$pollAnswers = SimpollHelper::getAnswers($moduleId, (array) $params->get('answers', []));
 
-// Store vote using session (to prevent multiple votes)
-$session = Factory::getApplication()->getSession();
-$voted = $session->get('mod_simpoll_voted_' . $module_id, false);
+$sessionKey = 'mod_simpoll_voted_' . $moduleId;
+$voted      = (bool) $session->get($sessionKey, false);
 
-// If the user hasn't voted and submits a vote, process the vote
-if ($vote && !$voted) {
-    $session->set('mod_simpoll_voted_' . $module_id, true);
+$vote       = $input->post->getAlnum('poll_answer', '');
+$postedPoll = $input->post->getInt('poll_id', 0);
 
-    // Increment the vote count in the database
-    $query->clear()
-        ->select('vote_count')
-        ->from($db->quoteName('#__simpoll_votes'))
-        ->where($db->quoteName('poll_id') . ' = ' . (int)$module_id)
-        ->where($db->quoteName('option_text') . ' = ' . $db->quote($vote));
+// Only handle a submission meant for THIS module instance
+$isSubmission = !$voted && $postedPoll === $moduleId && $vote !== '';
 
-    $db->setQuery($query);
-    $currentVoteCount = $db->loadResult();
-
-    if ($currentVoteCount !== null) {
-        $query->clear()
-            ->update($db->quoteName('#__simpoll_votes'))
-            ->set($db->quoteName('vote_count') . ' = ' . (int)($currentVoteCount + 1))
-            ->where($db->quoteName('poll_id') . ' = ' . (int)$module_id)
-            ->where($db->quoteName('option_text') . ' = ' . $db->quote($vote));
-    } else {
-        $query->clear()
-            ->insert($db->quoteName('#__simpoll_votes'))
-            ->columns($db->quoteName(['poll_id', 'option_text', 'vote_count']))
-            ->values((int)$module_id . ', ' . $db->quote($vote) . ', 1');
-    }
-
-    $db->setQuery($query);
-    $db->execute();
+if ($isSubmission || $voted) {
+    // Moves votes stored by version 1.1 onto the answer keys (no-op once done)
+    SimpollHelper::adoptLegacyVotes($moduleId, $pollAnswers);
 }
 
-// Fetch vote results specific to this poll/module
-$query->clear()
-    ->select($db->quoteName(['option_text', 'vote_count']))
-    ->from($db->quoteName('#__simpoll_votes'))
-    ->where($db->quoteName('poll_id') . ' = ' . (int)$module_id);
+if ($isSubmission) {
+    if (!Session::checkToken()) {
+        $app->enqueueMessage(Text::_('JINVALID_TOKEN_NOTICE'), 'warning');
+    } elseif (isset($pollAnswers[$vote])) {
+        SimpollHelper::recordVote($moduleId, $vote, (string) $pollAnswers[$vote]);
+        $session->set($sessionKey, true);
+        $voted = true;
+    }
+}
 
-$db->setQuery($query);
-$results = $db->loadObjectList();
+// Results are only needed once the visitor has voted
+$counts     = [];
+$totalVotes = 0;
 
-// Display the poll form or results
+if ($voted) {
+    $counts     = SimpollHelper::getCounts($moduleId, array_keys($pollAnswers));
+    $totalVotes = array_sum($counts);
+}
+
 require ModuleHelper::getLayoutPath('mod_simpoll', $params->get('layout', 'default'));
-

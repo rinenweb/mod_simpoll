@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS `#__simpoll_votes`
+DROP TABLE IF EXISTS `#__simpoll_votes`;

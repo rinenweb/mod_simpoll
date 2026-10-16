@@ -1,57 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="5.0" client="site" method="upgrade">
-    <name>SimPoll Module</name>
-    <title>MOD_SIMPOLL_TITLE</title>
-    <description><![CDATA[
-	<h2>SimPoll Module</h2>
-	A simple module that allows admins to create a poll and display it on the front end. <br/>
-	<br />
-	]]></description>
-    <creationDate>2024-11-27</creationDate>
-    <version>1.1</version>
+<extension type="module" client="site" method="upgrade">
+    <name>MOD_SIMPOLL</name>
+    <creationDate>2026-10-16</creationDate>
+    <version>1.2</version>
     <author>Rinenweb</author>
-        <authorEmail>info@rinenweb.eu</authorEmail>
-	    <authorUrl>https://www.rinenweb.eu</authorUrl>
+    <authorEmail>info@rinenweb.eu</authorEmail>
+    <authorUrl>https://www.rinenweb.eu</authorUrl>
     <license>GPL License v3</license>
+    <description>MOD_SIMPOLL_XML_DESCRIPTION</description>
+    <namespace path="src">Rinenweb\Module\Simpoll</namespace>
+
     <files>
         <filename module="mod_simpoll">mod_simpoll.php</filename>
         <filename>index.html</filename>
-        <folder>tmpl</folder>
-        <folder>sql</folder>
         <folder>language</folder>
+        <folder>sql</folder>
+        <folder>src</folder>
+        <folder>tmpl</folder>
     </files>
+
+    <languages>
+        <language tag="en-GB">language/en-GB/mod_simpoll.ini</language>
+        <language tag="en-GB">language/en-GB/mod_simpoll.sys.ini</language>
+        <language tag="el-GR">language/el-GR/mod_simpoll.ini</language>
+        <language tag="el-GR">language/el-GR/mod_simpoll.sys.ini</language>
+    </languages>
+
+    <install>
+        <sql>
+            <file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+        </sql>
+    </install>
+    <uninstall>
+        <sql>
+            <file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+        </sql>
+    </uninstall>
+    <update>
+        <schemas>
+            <schemapath type="mysql">sql/updates/mysql</schemapath>
+        </schemas>
+    </update>
 
     <config>
         <fields name="params">
             <fieldset name="basic">
-                <field 
-                    name="question" 
-                    type="text" 
-                    label="MOD_SIMPOLL_QUESTION_LABEL" 
-                    description="MOD_SIMPOLL_QUESTION_DESC" 
-                    required="true" />
+                <field
+                    name="question"
+                    type="text"
+                    label="MOD_SIMPOLL_QUESTION_LABEL"
+                    description="MOD_SIMPOLL_QUESTION_DESC"
+                    required="true"
+                />
 
-                <field 
-                    name="answers" 
-                    type="subform" 
-                    label="MOD_SIMPOLL_ANSWERS_LABEL" 
+                <field
+                    name="answers"
+                    type="subform"
+                    label="MOD_SIMPOLL_ANSWERS_LABEL"
                     description="MOD_SIMPOLL_ANSWERS_DESC"
+                    layout="joomla.form.field.subform.repeatable-table"
                     multiple="true"
-	                min="1"
-                	max="7"
-                    required="true" >
-                    	<form>
-                            <fieldset name="basic" addfieldprefix="Joomla\Component\Categories\Administrator\Field">		                    
-                                <field
-			                    name="answer_text"
-			                    type="text"
-			                    label="Answer Text"
+                    min="2"
+                    max="7"
+                    required="true"
+                >
+                    <form>
+                        <fieldset name="answer" addfieldprefix="Rinenweb\Module\Simpoll\Site\Field">
+                            <field
+                                name="answer_text"
+                                type="text"
+                                label="MOD_SIMPOLL_ANSWER_LABEL"
                                 filter="safehtml"
-			                    />
-		        	</fieldset>	                    
-                        </form>
-                 </field>
-                 <field name="customCss" type="editor" default=".poll-bar {
+                            />
+                            <field
+                                name="answer_id"
+                                type="simpollanswer"
+                                label="MOD_SIMPOLL_ANSWER_VOTES_LABEL"
+                                filter="alnum"
+                            />
+                        </fieldset>
+                    </form>
+                </field>
+
+                <field
+                    name="customCss"
+                    type="editor"
+                    label="MOD_SIMPOLL_CUSTOM_CSS_LABEL"
+                    description="MOD_SIMPOLL_CUSTOM_CSS_DESC"
+                    default=".poll-bar {
     background-color: #f3f3f3;
     border: 1px solid #ccc;
     width: 100%;
@@ -61,38 +97,46 @@
 .poll-bar-fill {
     background-color: #4caf50;
     height: 100%;
-} .poll-result { margin: 1rem; } .poll-result p { margin-bottom: .1rem; }" filter="raw" label="Custom CSS" description="CSS code to override the default template styling" rows="5" editor="codemirror|none" buttons="false" syntax="css" />
-              <field name="custom_text" type="editor" label="Text Below Poll Answers"
-    description="Enter some text to display below the poll answers."
-    default="" filter="raw"
-        />
-    </fieldset>
+} .poll-result { margin: 1rem; } .poll-result p { margin-bottom: .1rem; }"
+                    filter="raw"
+                    rows="5"
+                    editor="codemirror|none"
+                    buttons="false"
+                    syntax="css"
+                />
+
+                <field
+                    name="custom_text"
+                    type="editor"
+                    label="MOD_SIMPOLL_CUSTOM_TEXT_LABEL"
+                    description="MOD_SIMPOLL_CUSTOM_TEXT_DESC"
+                    default=""
+                    filter="\Joomla\CMS\Component\ComponentHelper::filterText"
+                />
+            </fieldset>
+
             <fieldset name="advanced" label="JGLOBAL_FIELDSET_ADVANCED">
                 <field
-					name="moduleclass_sfx"
-					type="textarea"
-					label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL"
-					rows="1"
-					validate="CssIdentifier"
-				/>
+                    name="layout"
+                    type="modulelayout"
+                    label="JFIELD_ALT_LAYOUT_LABEL"
+                    class="form-select"
+                    validate="moduleLayout"
+                />
+                <field
+                    name="moduleclass_sfx"
+                    type="textarea"
+                    label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL"
+                    rows="1"
+                    validate="CssIdentifier"
+                />
+                <!-- Output depends on each visitor's session, so it must never be cached -->
+                <field name="cache" type="hidden" default="0" />
             </fieldset>
         </fields>
     </config>
-    <languages>
-        <language tag="en-GB">language/en-GB/mod_simpoll.ini</language>
-        <language tag="el-GR">language/el-GR/mod_simpoll.ini</language>
-    </languages>
-    	<install>
-	     <sql>
-	         <file driver="mysqli" charset="utf8">sql/install.mysql.utf8.sql</file>
-	     </sql>
-	</install>
-	<uninstall>
-	     <sql>
-	         <file driver="mysqli" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
-	     </sql>
-	</uninstall>
-	<updateservers>
-		<server type="extension" name="SimPoll module updates">https://raw.githubusercontent.com/rinenweb/mod_simpoll/main/manifest.xml</server>
-	</updateservers>
+
+    <updateservers>
+        <server type="extension" name="SimPoll module updates">https://raw.githubusercontent.com/rinenweb/mod_simpoll/main/manifest.xml</server>
+    </updateservers>
 </extension>
